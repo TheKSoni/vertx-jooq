@@ -21,6 +21,15 @@ To run your application:
 ./mvnw clean compile exec:java
 ```
 
+Notice that if you're using the same database that was used initially, you may need to run
+
+```
+mvn flyway:clean
+```
+
+... in order to reset your database (**Beware: As it says. This resets your database**).
+
+
 == Help
 
 * https://vertx.io/docs/[Vert.x Documentation]
