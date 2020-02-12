@@ -1,4 +1,4 @@
-= Executor-test
+= vertx-jooq
 
 image:https://img.shields.io/badge/vert.x-3.7.1-purple.svg[link="https://vertx.io"]
 
