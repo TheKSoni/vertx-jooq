@@ -1,0 +1,8 @@
+DROP SCHEMA IF EXISTS mcve CASCADE;
+
+CREATE SCHEMA mcve;
+
+CREATE TABLE mcve.data (
+  id SERIAL PRIMARY KEY,
+  value int NOT NULL
+);

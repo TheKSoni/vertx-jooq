@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="DEBUG" package="com.test">
+  <Properties>
+    <Property name="LOG_LEVEL">DEBUG</Property>
+  </Properties>
+  <CustomLevels>
+    <CustomLevel name="ALERT" intLevel="150" />
+  </CustomLevels>
+  <Appenders>
+    <RollingRandomAccessFile name="RollingRandomAccessFile" fileName="/tmp/log/logs" filePattern="/tmp/log/logs.%i">
+      <PatternLayout>
+        <Pattern>%highlight{%d{HH:mm:ss.SSS} %-5level %c{3.}.%M @%L %t - %msg%n}{FATAL=red blink, ERROR=red, WARN=yellow bold, INFO=white, DEBUG=green bold, TRACE=blue}</Pattern>
+      </PatternLayout>
+      <Policies>
+        <SizeBasedTriggeringPolicy size="5000 KB"/>
+      </Policies>
+      <DefaultRolloverStrategy max="20"/>
+    </RollingRandomAccessFile>
+  </Appenders>
+  <Loggers>
+    <!-- Other jOOQ related debug log output -->
+    <Logger name="org.jooq" level="DEBUG">
+      <AppenderRef ref="RollingRandomAccessFile"/>
+    </Logger>
+    <Logger name="com.zaxxer" level="ALL" additivity="false">
+      <AppenderRef ref="RollingRandomAccessFile" />
+    </Logger>
+    <Logger name="com.theKsoni.executor.jooq" level="ALL" additivity="false">
+      <AppenderRef ref="RollingRandomAccessFile" />
+    </Logger>
+    <Root level="ERROR">
+      <AppenderRef ref="CONSOLE" />
+    </Root>
+  </Loggers>
+</Configuration>
