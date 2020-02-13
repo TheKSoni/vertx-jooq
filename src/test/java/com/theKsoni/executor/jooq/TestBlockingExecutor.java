@@ -12,21 +12,23 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+//Using Vertx Blocking Executor for query execution
 @ExtendWith(VertxExtension.class)
-
-//Main Thread (event-loop) executing queries
-public class TestMainVerticle extends Common {
+public class TestBlockingExecutor extends Common {
 
   private final Logger log = LoggerFactory.getLogger(this.getClass());
+
+  private VertxBlockingExecutor vertxBlockingExecutor;
 
   @BeforeEach
   void deploy_verticle(Vertx vertx, VertxTestContext testContext) {
     vertx.deployVerticle(new MainVerticle(), testContext.succeeding(id -> testContext.completeNow()));
+    vertxBlockingExecutor = new VertxBlockingExecutor(vertx);
   }
 
   @Test
-  void connectionProviderAcquireConnection_SuccessCase(Vertx vertx, VertxTestContext testContext) {
-    log.info("executing connectionProviderAcquireConnection_SuccessCase");
+  void connectionProviderAcquireConnection_FailCase(Vertx vertx, VertxTestContext testContext) {
+    log.info("executing connectionProviderAcquireConnection_FailCase");
 
     Connection connection = getConnectionProvider().acquire(); //Acquire Connection manually
     executeQueries(testContext, connection);
@@ -34,22 +36,25 @@ public class TestMainVerticle extends Common {
   }
 
   @Test
-  void connectionRunnable_SuccessCase(Vertx vertx, VertxTestContext testContext) {
-    log.info("executing connectionRunnable_SuccessCase");
+  void connectionRunnable_FailCase(Vertx vertx, VertxTestContext testContext) {
+    log.info("executing connectionRunnable_FailCase");
     getDslContext().connection(connection -> {//connectionRunnable
       executeQueries(testContext, connection);
     });
   }
 
+  @Override
   protected final CompletableFuture<Integer> _insertRecord(Connection connection) {
-    return CompletableFuture.completedFuture(insertRecord(connection));
+    return vertxBlockingExecutor.run(() -> insertRecord(connection));
   }
 
+  @Override
   protected final CompletableFuture<Boolean> _acquireLocked(Connection connection, int value) {
-    return CompletableFuture.completedFuture(acquireLocked(connection, value)); //acquire postgres 9.6 advisory lock
+    return vertxBlockingExecutor.run(() -> acquireLocked(connection, value)); //acquire postgres 9.6 advisory lock
   }
 
+  @Override
   protected final CompletableFuture<Boolean> _releaseLocked(Connection connection, int value) {
-    return CompletableFuture.completedFuture(releaseLocked(connection, value)); //release postgres 9.6 advisory lock
+    return vertxBlockingExecutor.run(() -> releaseLocked(connection, value)); //release postgres 9.6 advisory lock
   }
 }
